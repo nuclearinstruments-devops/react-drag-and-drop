@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import GridLayout from 'react-grid-layout';
 import type { Layout } from 'react-grid-layout';
@@ -25,8 +25,11 @@ export interface DragDropGridProps {
   width?: number;
   onLayoutChange?: (layout: Layout[]) => void;
   onItemsChange?: (items: GridItem[]) => void;
+  onSave?: (items: GridItem[]) => Promise<void>;
   isDraggable?: boolean;
   isResizable?: boolean;
+  compactType?: 'vertical' | 'horizontal' | null;
+  isEditMode?: boolean;
   className?: string;
 }
 
@@ -37,11 +40,19 @@ const DragDropGrid: React.FC<DragDropGridProps> = ({
   width = 1200,
   onLayoutChange,
   onItemsChange,
+  onSave,
   isDraggable = true,
   isResizable = true,
+  compactType = 'vertical',
+  isEditMode = true,
   className = '',
 }) => {
   const [currentItems, setCurrentItems] = useState<GridItem[]>(items);
+
+  // Update items when props change
+  useEffect(() => {
+    setCurrentItems(items);
+  }, [items]);
 
   // Convert GridItems to react-grid-layout Layout format
   const layout: Layout[] = currentItems.map((item) => ({
@@ -54,6 +65,7 @@ const DragDropGrid: React.FC<DragDropGridProps> = ({
     minH: item.minH,
     maxW: item.maxW,
     maxH: item.maxH,
+    static: !isEditMode,
   }));
 
   const handleLayoutChange = (newLayout: Layout[]) => {
@@ -83,6 +95,26 @@ const DragDropGrid: React.FC<DragDropGridProps> = ({
     }
   };
 
+  const handleDragStop = async () => {
+    if (onSave) {
+      try {
+        await onSave(currentItems);
+      } catch (error) {
+        console.error('Failed to save layout:', error);
+      }
+    }
+  };
+
+  const handleResizeStop = async () => {
+    if (onSave) {
+      try {
+        await onSave(currentItems);
+      } catch (error) {
+        console.error('Failed to save layout:', error);
+      }
+    }
+  };
+
   return (
     <div className={`drag-drop-grid-container ${className}`}>
       <GridLayout
@@ -92,9 +124,11 @@ const DragDropGrid: React.FC<DragDropGridProps> = ({
         rowHeight={rowHeight}
         width={width}
         onLayoutChange={handleLayoutChange}
-        isDraggable={isDraggable}
-        isResizable={isResizable}
-        compactType={null}
+        onDragStop={handleDragStop}
+        onResizeStop={handleResizeStop}
+        isDraggable={isDraggable && isEditMode}
+        isResizable={isResizable && isEditMode}
+        compactType={compactType}
         preventCollision={false}
       >
         {currentItems.map((item) => (

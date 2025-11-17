@@ -10,3 +10,6 @@ export {
 } from './widgets';
 
 export type { WidgetProps, InfoWidgetProps } from './widgets';
+
+export { WidgetSidebar } from './WidgetSidebar';
+export type { WidgetTemplate, WidgetSidebarProps } from './WidgetSidebar';
