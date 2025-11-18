@@ -1,0 +1,98 @@
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  padding: 20px;
+  color: white;
+}
+
+.header-content {
+  max-width: 1520px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-title h1 {
+  font-size: 48px;
+  margin: 0 0 10px 0;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.header-title p {
+  font-size: 18px;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.header-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.mode-toggle {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.mode-toggle.edit {
+  background: white;
+  color: #667eea;
+}
+
+.mode-toggle.view {
+  background: #4caf50;
+  color: white;
+}
+
+.mode-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.mode-toggle:active {
+  transform: translateY(0);
+}
+
+.app-main {
+  flex: 1;
+  padding: 0 20px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.dashboard-layout {
+  max-width: 1520px;
+  width: 100%;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  height: calc(100vh - 200px);
+  position: sticky;
+  top: 20px;
+}
+
+.dashboard-content {
+  flex: 1;
+  min-width: 0;
+}
+

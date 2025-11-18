@@ -1,0 +1,55 @@
+.counter-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 20px;
+}
+
+.counter-display {
+  font-size: 48px;
+  font-weight: 700;
+  color: #f57c00;
+  font-family: 'Arial', sans-serif;
+}
+
+.counter-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.counter-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 60px;
+}
+
+.counter-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.counter-button:active {
+  transform: translateY(0);
+}
+
+.counter-button.increment {
+  background-color: #4caf50;
+  color: white;
+}
+
+.counter-button.decrement {
+  background-color: #f44336;
+  color: white;
+}
+
+.counter-button.reset {
+  background-color: #9e9e9e;
+  color: white;
+}
