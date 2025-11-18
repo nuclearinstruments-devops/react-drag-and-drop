@@ -74,6 +74,23 @@ const DragDropGrid: React.FC<DragDropGridProps> = ({
   }));
 
   const handleLayoutChange = (newLayout: Layout[]) => {
+    // Check if layout actually changed to prevent infinite loops
+    const hasChanged = newLayout.some((newItem) => {
+      const currentItem = currentItems.find((item) => item.id === newItem.i);
+      if (!currentItem) return true;
+      
+      return (
+        currentItem.x !== newItem.x ||
+        currentItem.y !== newItem.y ||
+        currentItem.w !== newItem.w ||
+        currentItem.h !== newItem.h
+      );
+    });
+
+    if (!hasChanged) {
+      return; // No actual changes, skip update
+    }
+
     // Update items with new positions
     const updatedItems = currentItems.map((item) => {
       const layoutItem = newLayout.find((l) => l.i === item.id);
