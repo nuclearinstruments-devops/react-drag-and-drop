@@ -148,7 +148,7 @@ function App() {
     }
   };
 
-  // Handle adding widget from sidebar
+  // Handle adding widget from sidebar (via click)
   const handleAddWidget = (widget: WidgetTemplate) => {
     const newId = `${widget.id}-${Date.now()}`;
     const newWidget: GridItem = {
@@ -160,6 +160,28 @@ function App() {
       component: createWidgetComponent(widget.id),
     };
     setGridItems([...gridItems, newWidget]);
+  };
+
+  // Handle adding widget from sidebar (via drop)
+  const handleAddWidgetFromDrop = (widgetId: string) => {
+    const widget = availableWidgets.find(w => w.id === widgetId);
+    if (!widget) return;
+    
+    const newId = `${widget.id}-${Date.now()}`;
+    const newWidget: GridItem = {
+      id: newId,
+      x: 0,
+      y: Infinity, // Will be placed at the bottom
+      w: widget.defaultSize.w,
+      h: widget.defaultSize.h,
+      component: createWidgetComponent(widget.id),
+    };
+    setGridItems([...gridItems, newWidget]);
+  };
+
+  // Handle removing widget by dragging out
+  const handleRemoveWidget = (widgetId: string) => {
+    setGridItems(gridItems.filter(item => item.id !== widgetId));
   };
 
   // Handle saving to API (simulated)
@@ -231,6 +253,8 @@ function App() {
               width={isEditMode ? 1200 - 320 : 1200}
               onItemsChange={handleItemsChange}
               onSave={handleSave}
+              onAddWidget={handleAddWidgetFromDrop}
+              onRemoveWidget={handleRemoveWidget}
               compactType="vertical"
               isEditMode={isEditMode}
             />

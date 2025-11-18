@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import GridLayout from 'react-grid-layout';
 import type { Layout } from 'react-grid-layout';
@@ -26,6 +26,8 @@ export interface DragDropGridProps {
   onLayoutChange?: (layout: Layout[]) => void;
   onItemsChange?: (items: GridItem[]) => void;
   onSave?: (items: GridItem[]) => Promise<void>;
+  onAddWidget?: (widgetId: string) => void;
+  onRemoveWidget?: (widgetId: string) => void;
   isDraggable?: boolean;
   isResizable?: boolean;
   compactType?: 'vertical' | 'horizontal' | null;
@@ -41,6 +43,8 @@ const DragDropGrid: React.FC<DragDropGridProps> = ({
   onLayoutChange,
   onItemsChange,
   onSave,
+  onAddWidget,
+  onRemoveWidget,
   isDraggable = true,
   isResizable = true,
   compactType = 'vertical',
@@ -48,6 +52,7 @@ const DragDropGrid: React.FC<DragDropGridProps> = ({
   className = '',
 }) => {
   const [currentItems, setCurrentItems] = useState<GridItem[]>(items);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   // Update items when props change
   useEffect(() => {
@@ -95,7 +100,25 @@ const DragDropGrid: React.FC<DragDropGridProps> = ({
     }
   };
 
-  const handleDragStop = async () => {
+  const handleDragStop = async (_layout: Layout[], _oldItem: Layout, newItem: Layout, _placeholder: Layout, e: MouseEvent) => {
+    // Check if item was dragged outside the grid to remove it
+    if (gridRef.current && onRemoveWidget) {
+      const rect = gridRef.current.getBoundingClientRect();
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      
+      // If the mouse is outside the grid bounds, remove the item
+      if (
+        mouseX < rect.left ||
+        mouseX > rect.right ||
+        mouseY < rect.top ||
+        mouseY > rect.bottom
+      ) {
+        onRemoveWidget(newItem.i);
+        return;
+      }
+    }
+
     if (onSave) {
       try {
         await onSave(currentItems);
@@ -115,8 +138,22 @@ const DragDropGrid: React.FC<DragDropGridProps> = ({
     }
   };
 
+  // Handle drop from external source (sidebar)
+  const handleDrop = (_layout: Layout[], _layoutItem: Layout, _event: Event) => {
+    // Get the widget ID from the drag event
+    const event = _event as DragEvent;
+    const widgetId = event.dataTransfer?.getData('widgetId');
+    
+    if (widgetId && onAddWidget) {
+      onAddWidget(widgetId);
+    }
+  };
+
   return (
-    <div className={`drag-drop-grid-container ${className}`}>
+    <div 
+      ref={gridRef}
+      className={`drag-drop-grid-container ${className}`}
+    >
       <GridLayout
         className="layout"
         layout={layout}
@@ -126,13 +163,24 @@ const DragDropGrid: React.FC<DragDropGridProps> = ({
         onLayoutChange={handleLayoutChange}
         onDragStop={handleDragStop}
         onResizeStop={handleResizeStop}
+        onDrop={handleDrop}
         isDraggable={isDraggable && isEditMode}
         isResizable={isResizable && isEditMode}
+        isDroppable={isEditMode}
         compactType={compactType}
         preventCollision={false}
       >
         {currentItems.map((item) => (
           <div key={item.id} className="grid-item">
+            {isEditMode && onRemoveWidget && (
+              <button
+                className="grid-item-delete"
+                onClick={() => onRemoveWidget(item.id)}
+                title="Rimuovi widget"
+              >
+                ✕
+              </button>
+            )}
             <div className="grid-item-content">{item.component}</div>
           </div>
         ))}
